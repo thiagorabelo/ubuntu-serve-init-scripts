@@ -58,6 +58,29 @@ function disable_ipv6 {
 }
 
 
+# TODO: Use me
+function npt_br {
+    local tmpfile="/tmp/timesyncd.conf"
+    local timesyncdpath="/etc/systemd/timesyncd.conf"
+
+    local timezone="America/Fortaleza"
+    local ntpserver="pool.ntp.br"
+    local ntpserverfallback="ntp.ubuntu.com"
+
+    timedatectl set-timezone "${timezone}"
+
+    cat "${timesyncdpath}" \
+        | sed -E "s/^#NTP=.*$/NTP=${ntpserver}/" \
+        | sed -E "s/^#FallbackNTP=.*$/FallbackNTP=${ntpserverfallback}/" > "${timesyncdpath}"
+
+    mv "${tmpfile}" "${timesyncdpath}"
+
+    timedatectl set-ntp true
+
+    systemctl restart systemd-timesyncd.service
+}
+
+
 #################################################################
 
 
